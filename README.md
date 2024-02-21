@@ -5,6 +5,7 @@
 ```bash
 $ cp .env.example .env
 ``` 
+##### for the root folder and all inside services
 ##### make sure all to fill the values in .env
 
 ## build the images
