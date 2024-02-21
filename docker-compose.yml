@@ -1,0 +1,74 @@
+version: '1.1'
+
+services:
+  app-db:
+    image: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_MULTIPLE_DATABASES=${POSTGRES_MULTIPLE_DATABASES}
+    networks:
+      - appName-network
+    volumes:
+      - ./pg-init-scripts:/docker-entrypoint-initdb.d
+      - postgres02:/var/lib/postgresql/data
+    env_file:
+      - ./.env
+    container_name: app-db
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile.dev
+    ports:
+      - '3001:3001'
+    env_file:
+      - ./user-service/.env
+    networks:
+      - appName-network
+    depends_on:
+      - app-db
+      - rabbitmq
+    volumes:
+      - ./user-service/src:/usr/src/app/user-service/src
+    container_name: user-service
+  product-service:
+    build:
+      context: .
+      dockerfile: ./product-service/Dockerfile.dev
+    env_file:
+      - ./product-service/.env
+    networks:
+      - appName-network
+    depends_on:
+      - user-service
+      - rabbitmq
+    volumes:
+      - ./product-service/src:/usr/src/app/product-service/src
+    ports:
+      - '3002:3002'
+    container_name: product-service
+  rabbitmq:
+    image: rabbitmq
+    networks:
+      - appName-network
+    ports:
+      - '5672:5672'
+  db-pgadmin:
+    image: dpage/pgadmin4
+    container_name: db-pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "5050:80"
+    networks:
+      - appName-network
+volumes:
+  postgres03:
+    driver: local
+networks:
+  appName-network:
+    driver: bridge

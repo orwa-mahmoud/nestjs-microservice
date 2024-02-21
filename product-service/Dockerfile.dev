@@ -1,0 +1,14 @@
+FROM node:alpine As development
+
+WORKDIR /usr/src/app/product-service
+
+COPY ./product-service/package*.json ./
+COPY ./product-service/src ./src
+COPY ./product-service/typeorm-cli.config.ts ./
+COPY ./product-service/tsconfig*.json ./
+
+RUN npm install
+
+RUN npm run build
+
+CMD ["npm", "run", "start:dev"]
