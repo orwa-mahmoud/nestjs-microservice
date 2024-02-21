@@ -18,6 +18,13 @@ $ docker compose build
 $ docker compose up -d
 ```
 
+##### admin account will be
+
+```bash
+admin@admin.com
+admin12345
+```
+
 
 ## DataBase
 

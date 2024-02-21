@@ -14,7 +14,7 @@ services:
       - appName-network
     volumes:
       - ./pg-init-scripts:/docker-entrypoint-initdb.d
-      - postgres02:/var/lib/postgresql/data
+      - postgres03:/var/lib/postgresql/data
     env_file:
       - ./.env
     container_name: app-db
